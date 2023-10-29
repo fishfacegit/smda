@@ -175,7 +175,7 @@ class SmdaFunction(object):
                     instructions_as_strings.append(f'{smda_ins.offset:x}: {smda_ins.mnemonic} {printable_api}')
                 else:
                     instructions_as_strings.append(f'{smda_ins.offset:x}: {smda_ins.mnemonic} {smda_ins.operands}')
-            block_entry += "\l".join(instructions_as_strings)
+            block_entry += r"\l".join(instructions_as_strings)
             dot_graph += block_entry + '"];\n'
             if smda_block.offset in self.blockrefs:
                 for target_offset in self.blockrefs[smda_block.offset]:
