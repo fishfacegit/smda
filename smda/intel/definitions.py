@@ -1,21 +1,21 @@
 
 # some mnemonics as specific to capstone
-CJMP_INS = ["je", "jne", "js", "jns", "jp", "jnp", "jo", "jno", "jl", "jle", "jg", "jge", "jb", "jbe", "ja", "jae", "jcxz", "jecxz", "jrcxz"]
-LOOP_INS = ["loop", "loopne", "loope"]
-JMP_INS = ["jmp", "ljmp"]
-CALL_INS = ["call", "lcall"]
-RET_INS = ["ret", "retn", "retf", "iret"]
-END_INS = ["ret", "retn", "retf", "iret", "int3", "hlt"]
-REGS_32BIT = ["eax", "ebx", "ecx", "edx", "esi", "edi", "ebp", "esp"]
-REGS_64BIT = ["rax", "rbx", "rcx", "rdx", "rsp", "rbp", "rsi", "rdi", "rip", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"]
-DOUBLE_ZERO = bytearray(b"\x00\x00")
+CJMP_INS = set(["je", "jne", "js", "jns", "jp", "jnp", "jo", "jno", "jl", "jle", "jg", "jge", "jb", "jbe", "ja", "jae", "jcxz", "jecxz", "jrcxz"])
+LOOP_INS = set(["loop", "loopne", "loope"])
+JMP_INS = set(["jmp", "ljmp"])
+CALL_INS = set(["call", "lcall"])
+RET_INS = set(["ret", "retn", "retf", "iret"])
+END_INS = set(["ret", "retn", "retf", "iret", "int3", "hlt"])
+REGS_32BIT = set(["eax", "ebx", "ecx", "edx", "esi", "edi", "ebp", "esp"])
+REGS_64BIT = set(["rax", "rbx", "rcx", "rdx", "rsp", "rbp", "rsi", "rdi", "rip", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"])
+DOUBLE_ZERO = b"\x00\x00"
 
-DEFAULT_PROLOGUES = [
+DEFAULT_PROLOGUES = set([
     b"\x8B\xFF\x55\x8B\xEC",
     b"\x89\xFF\x55\x8B\xEC",
     b"\x55\x8B\xEC",
     b"\x55\x89\xE5"
-]
+])
 
 # these cover 99% of confirmed function starts in the reference data set
 COMMON_PROLOGUES = {
@@ -93,20 +93,20 @@ COMMON_PROLOGUES = {
 #TODO: 2018-06-27 expand the coverage in this list
 # https://stackoverflow.com/questions/25545470/long-multi-byte-nops-commonly-understood-macros-or-other-notation
 GAP_SEQUENCES = {
-    1: [
+    1: set([
         b"\x90",  # NOP1_OVERRIDE_NOP - AMD / nop - INTEL
         b"\xCC",  # int3
         b"\x00",  # pass over sequences of null bytes
-    ],
-    2: [
+    ]),
+    2: set([
         b"\x66\x90",  # NOP2_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x8b\xc0",
         b"\x8b\xff",  # mov edi, edi
         b"\x8d\x00",  # lea eax, dword ptr [eax]
         b"\x86\xc0",  # xchg al, al
         b"\x66\x2e",  # NOP2_OVERRIDE_NOP - AMD / nop - INTEL
-    ],
-    3: [
+    ]),
+    3: set([
         b"\x0f\x1f\x00",  # NOP3_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x8d\x40\x00",  # lea eax, dword ptr [eax]
         b"\x8d\x00\x00",  # lea eax, dword ptr [eax]
@@ -114,58 +114,58 @@ GAP_SEQUENCES = {
         b"\x8d\x64\x24",  # lea esp, dword ptr [esp]
         b"\x8d\x76\x00",
         b"\x66\x66\x90"
-    ],
-    4: [
+    ]),
+    4: set([
         b"\x0f\x1f\x40\x00",  # NOP4_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x8d\x74\x26\x00",
         b"\x66\x66\x66\x90"
-    ],
-    5: [
+    ]),
+    5: set([
         b"\x0f\x1f\x44\x00\x00",  # NOP5_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x90\x8d\x74\x26\x00"
-    ],
-    6: [
+    ]),
+    6: set([
         b"\x66\x0f\x1f\x44\x00\x00",  # NOP6_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x8d\xb6\x00\x00\x00\x00"
-    ],
-    7: [
+    ]),
+    7: set([
         b"\x0f\x1f\x80\x00\x00\x00\x00",  # NOP7_OVERRIDE_NOP - AMD / nop - INTEL,
         b"\x8d\xb4\x26\x00\x00\x00\x00",
         b"\x8D\xBC\x27\x00\x00\x00\x00"
-    ],
-    8: [
+    ]),
+    8: set([
         b"\x0f\x1f\x84\x00\x00\x00\x00\x00",  # NOP8_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x90\x8d\xb4\x26\x00\x00\x00\x00"
-    ],
-    9: [
+    ]),
+    9: set([
         b"\x66\x0f\x1f\x84\x00\x00\x00\x00\x00",  # NOP9_OVERRIDE_NOP - AMD / nop - INTEL
         b"\x89\xf6\x8d\xbc\x27\x00\x00\x00\x00"
-    ],
-    10: [
+    ]),
+    10: set([
         b"\x66\x66\x0f\x1f\x84\x00\x00\x00\x00\x00",  # NOP10_OVERRIDE_NOP - AMD
         b"\x8d\x76\x00\x8d\xbc\x27\x00\x00\x00\x00",
         b"\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ],
-    11: [
+    ]),
+    11: set([
         b"\x66\x66\x66\x0f\x1f\x84\x00\x00\x00\x00\x00",  # NOP11_OVERRIDE_NOP - AMD
         b"\x8d\x74\x26\x00\x8d\xbc\x27\x00\x00\x00\x00",
         b"\x66\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ],
-    12: [
+    ]),
+    12: set([
         b"\x8d\xb6\x00\x00\x00\x00\x8d\xbf\x00\x00\x00\x00",
         b"\x66\x66\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ],
-    13: [
+    ]),
+    13: set([
         b"\x8d\xb6\x00\x00\x00\x00\x8d\xbc\x27\x00\x00\x00\x00",
         b"\x66\x66\x66\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ],
-    14: [
+    ]),
+    14: set([
         b"\x8d\xb4\x26\x00\x00\x00\x00\x8d\xbc\x27\x00\x00\x00\x00",
         b"\x66\x66\x66\x66\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ],
-    15: [
+    ]),
+    15: set([
         b"\x66\x66\x66\x66\x66\x66\x2e\x0f\x1f\x84\x00\x00\x00\x00\x00"
-    ]
+    ])
 }
 
 
